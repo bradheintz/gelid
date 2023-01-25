@@ -1,28 +1,16 @@
-- a route has C cities
-- a chromosome is a list of integers C-1 items long
--- each item is the index of one of the cities not yet chosen for route
+- double-rep of genes - crossover-compatible rep, but also list of city indices
 
-- cities live within the square between (0,0) and (1,1)
-- score is 2^0.5 * (C-1) - D (where D is actual distance)
 
-- chromosome should be able to spit out its own route, but route should be eval'ed lazily
-
-- a chromosome should have a validity check which is called optionally after mutations or after children are created
+- an individual should have a validity check which is called optionally after mutations or after children are created
+-- for debugging/observation, not running
 
 
 PERF NOTES
 - remember that prepending and popping first are fast w/ elixir lists b/c cons
 
 
-
-172961743
-617417291
-
-
-
 HAPPENING NOW
-- factor experiment needs to suck in primes, and use the prime list to seed initial population
-- ts experiment needs to generate an appropriately constructed set of random paths
+- working on the scoring, which means working on the cities...
 
 
 * need to be able to seed random in *one* place for result repro
@@ -30,3 +18,4 @@ HAPPENING NOW
 * gpu?
 * be able to save state and continue a run
 * add license
+* add second experiment, perhaps factoring or something weird?
