@@ -7,6 +7,6 @@ defmodule CityMapTest do
 		result = CityMap.build(test_size)
 		assert Enum.count(result.cities) == test_size
 		assert result.map_size == test_size
-		assert Enum.count(List.first(result.map_size)) == 2 # 2 coords for city pos btwn 0 and 1
+		assert Enum.count(List.first(result.cities)) == 2 # 2 coords for city pos btwn 0 and 1
 	end
 end
