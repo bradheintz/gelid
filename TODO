@@ -19,3 +19,4 @@ HAPPENING NOW
 * be able to save state and continue a run
 * add license
 * add second experiment, perhaps factoring or something weird?
+* move abstract stuff (experiment, population modules) to Gelid. namespace
