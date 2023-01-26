@@ -76,7 +76,7 @@ defmodule GelidTest do
   # steps of algo - verify experiment is queried properly for each:
   #  start lifecycle
   #  √ score & rank population - gather mean score, best this gen, GOAT
-  #  select/cull?
+  #  select a portion of the population to reproduce - a 0-1 set in hyperparams, algo to be provided experiment
   #  repopulate - use crossover or other sexual repro - spec in experiment?
   #  mutate
   #  continue lifecycle until we stabilize, or hit max generations
