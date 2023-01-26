@@ -35,6 +35,17 @@ defmodule TravSalesExperimentTest do
     assert_in_delta test_result.fitness, 2.52842712, @testdelta
   end
 
+  # TODO this means we can only mutate babies
+  test "the scoring function should skip already-scored indivduals" do
+    test_map = %CityMap{cities: [[0.0, 0.0], [0.1, 0.0], [0.2, 0.0]]}
+    # NB this score is impossible and will verify the skip
+    test_individual = %Individual{genes: [0,0,0], fitness: 321.0} # traverses the three cities in list order
+
+    test_result = TravSalesExperiment.score(test_individual, test_map)
+    assert %Individual{} = test_result
+    assert_in_delta test_result.fitness, 321.0, @testdelta
+  end
+
   # distance calculations
   test "correctly computes distance for a single segment" do
     test_result = TravSalesExperiment._calc_distance(0.0, [0.1, 0.1], [[0.1, 0.2]], [0])

@@ -19,6 +19,7 @@ defmodule TravSalesExperiment do
 
   # expect domain to be a map
   @impl Experiment
+  def score(individual, _) when individual.fitness > 0.0, do: individual
   def score(individual, domain) do
   	max_possible = (Enum.count(domain.cities) - 1) * Float.pow(2.0, 0.5)
   	actual_distance = calc_distance(individual.genes, domain.cities) # going from generic to specific here
@@ -39,8 +40,7 @@ defmodule TravSalesExperiment do
   def _calc_distance(dist_acc, _, [], _), do: dist_acc
   def _calc_distance(dist_acc, curr_city, possible_next_cities, [next_gene | remaining_genes]) do
   	{ next_city, remaining_cities } = List.pop_at(possible_next_cities, next_gene)
-  	d = _two_city_distance(curr_city, next_city)
-  	_calc_distance(dist_acc + d, next_city, remaining_cities, remaining_genes)
+  	_calc_distance(dist_acc + _two_city_distance(curr_city, next_city), next_city, remaining_cities, remaining_genes)
   end
 
   def calc_distance(genes, cities) do
