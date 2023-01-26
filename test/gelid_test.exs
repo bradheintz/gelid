@@ -8,7 +8,7 @@ defmodule GelidTest do
     @impl Experiment
     def new_domain(_), do: []
     @impl Experiment
-    def score(_, _), do: []
+    def score(i, _), do: %Individual{i | fitness: :rand.uniform()}
   end
 
   @test_pop_size 321
@@ -59,7 +59,15 @@ defmodule GelidTest do
   end
 
   test "has a step that assigns a score to every individual" do
-    flunk("Need to be able to construct a domain and extract it from experiment before I can score")
+    test_pop = Gelid.init_population(TestExperiment, @test_pop_size, @test_gene_size)
+    test_domain = TestExperiment.new_domain(@test_domain_size)
+
+    test_result = Gelid.score(TestExperiment, test_pop, test_domain)
+    
+    assert %Population{} = test_result
+    assert Enum.count(test_result.members) == Enum.count(test_pop.members)
+    [m1 | [m2 | _]] = test_result.members
+    assert m1.fitness > m2.fitness
   end
 
 
@@ -67,9 +75,9 @@ defmodule GelidTest do
 
   # steps of algo - verify experiment is queried properly for each:
   #  start lifecycle
-  #  score & rank population - gather mean score, best this gen, GOAT
+  #  √ score & rank population - gather mean score, best this gen, GOAT
   #  select/cull?
-  #  repopulate - use crossover or other sexual mutation - spec in experiment?
+  #  repopulate - use crossover or other sexual repro - spec in experiment?
   #  mutate
   #  continue lifecycle until we stabilize, or hit max generations
 

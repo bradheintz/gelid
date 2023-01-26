@@ -36,7 +36,7 @@ defmodule TravSalesExperimentTest do
   end
 
   # TODO this means we can only mutate babies
-  test "the scoring function should skip already-scored indivduals" do
+  test "the scoring function should skip already-scored individuals" do
     test_map = %CityMap{cities: [[0.0, 0.0], [0.1, 0.0], [0.2, 0.0]]}
     # NB this score is impossible and will verify the skip
     test_individual = %Individual{genes: [0,0,0], fitness: 321.0} # traverses the three cities in list order

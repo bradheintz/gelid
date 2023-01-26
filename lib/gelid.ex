@@ -3,7 +3,7 @@ defmodule Gelid do
   # experiment becomes a binder for all steps if i include everywhere
   # including just the fn is more generic
   # but i also don't think i'm looking to reuse heavily outside here...
-  def add_pop(pop_list, _, 0, gene_count), do: pop_list
+  def add_pop(pop_list, _, 0, _), do: pop_list
   def add_pop(pop_list, experiment, num_left, gene_count) do
     add_pop([experiment.new_individual(gene_count) | pop_list], experiment, num_left - 1, gene_count)
   end
@@ -30,4 +30,17 @@ defmodule Gelid do
     %Population{members: pop_list, population_size: pop_size}
   end
 
+  def score_list(scored, [], _, _), do: scored
+  def score_list(scored, [next_unscored | remaining_unscored], experiment, domain) do
+    new_scored = experiment.score(next_unscored, domain)
+    score_list(scored ++ [new_scored], remaining_unscored, experiment, domain)
+  end
+
+  def score(experiment, population, domain) do
+    # TODO do this in a more elixirish way with |> operator
+    individuals_to_score = population.members
+    scored_individuals = score_list([], individuals_to_score, experiment, domain)
+    sorted_individuals = Enum.sort_by(scored_individuals, &(&1).fitness, :desc)
+    %Population{population | members: sorted_individuals}
+  end
 end
