@@ -1,6 +1,0 @@
-#!/bin/zsh
-
-echo Number of code lines:
-grep -v '^[[:space:]]*#' lib/* | grep -cv '^[[:space:]]*$'
-echo Number of test lines:
-grep -v '^[[:space:]]*#' test/* | grep -cv '^[[:space:]]*$'

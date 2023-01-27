@@ -9,10 +9,13 @@ defmodule GelidTest do
     def new_domain(_), do: []
     @impl Experiment
     def score(i, _), do: %Individual{i | fitness: :rand.uniform()}
+    @impl Experiment
+    def cull_population(population, keep_portion), do: %Population{ population | members: Enum.take(population.members, floor(Enum.count(population.members) * keep_portion))}
   end
 
   @test_pop_size 321
-  @test_hyperparams [ population_size: @test_pop_size, max_generations: 10, gene_count: 5 ]
+  @test_keep_portion 0.4
+  @test_hyperparams [ population_size: @test_pop_size, max_generations: 10, gene_count: 5, keep_portion: @test_keep_portion ]
 
   @test_domain_size 5
   @test_gene_size 7
@@ -25,7 +28,7 @@ defmodule GelidTest do
 
   test "run(): returned pop's member list size matches population_size hyperparam & its own population_size field" do
     test_result = Gelid.run(TestExperiment, @test_hyperparams)
-    assert test_result.population_size == @test_pop_size
+    assert test_result.target_size == @test_pop_size
     assert Enum.count(test_result.members) == @test_pop_size
   end
 
@@ -48,12 +51,11 @@ defmodule GelidTest do
     assert_hyperparam_checked(:gene_count)
   end
 
-
   # ALGORITHM STEPS
   test "has a step that creates a population with specified size and creation fn" do
     # TODO yeah this is a bit of an implementation test so sue me
     test_result = Gelid.init_population(TestExperiment, @test_pop_size, @test_gene_size)
-    assert test_result.population_size == @test_pop_size
+    assert test_result.target_size == @test_pop_size
     assert Enum.count(test_result.members) == @test_pop_size
     assert %Individual{} = List.first(test_result.members)
   end
@@ -70,13 +72,20 @@ defmodule GelidTest do
     assert m1.fitness > m2.fitness
   end
 
+  test "has a step that calls strategy from experiment to cull a proportion of the population specified in hyperparameters" do
+    test_pop = Gelid.init_population(TestExperiment, 100, @test_gene_size)
+    test_result = Gelid.cull_population(TestExperiment, test_pop, @test_keep_portion)
+    assert %Population{} = test_result
+    assert Enum.count(test_result.members) == floor(Enum.count(test_pop.members) * @test_keep_portion)
+  end
+
 
   # TEST experiment stops after some default number of generations (spec'able in hparams) if termination criteria not hit
 
   # steps of algo - verify experiment is queried properly for each:
   #  start lifecycle
   #  √ score & rank population - gather mean score, best this gen, GOAT
-  #  select a portion of the population to reproduce - a 0-1 set in hyperparams, algo to be provided experiment
+  #  √ select a portion of the population to reproduce - a 0-1 set in hyperparams, algo to be provided experiment
   #  repopulate - use crossover or other sexual repro - spec in experiment?
   #  mutate
   #  continue lifecycle until we stabilize, or hit max generations

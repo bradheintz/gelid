@@ -27,7 +27,7 @@ defmodule Gelid do
 
   def init_population(experiment, pop_size, gene_count) do
     pop_list = add_pop([], experiment, pop_size, gene_count)
-    %Population{members: pop_list, population_size: pop_size}
+    %Population{members: pop_list, target_size: pop_size}
   end
 
   def score_list(scored, [], _, _), do: scored
@@ -42,5 +42,9 @@ defmodule Gelid do
     scored_individuals = score_list([], individuals_to_score, experiment, domain)
     sorted_individuals = Enum.sort_by(scored_individuals, &(&1).fitness, :desc)
     %Population{population | members: sorted_individuals}
+  end
+
+  def cull_population(experiment, population, keep_portion) do
+    experiment.cull_population(population, keep_portion)
   end
 end

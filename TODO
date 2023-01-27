@@ -20,3 +20,8 @@ HAPPENING NOW
 * add license
 * add second experiment, perhaps factoring or something weird?
 * move abstract stuff (experiment, population modules) to Gelid. namespace
+
+
+REFACTOR
+- make hyperparams the struct part of experiment subclass
+-- easy to wrap in a script that fills in struct from persistent config

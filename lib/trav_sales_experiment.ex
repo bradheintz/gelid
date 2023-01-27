@@ -36,7 +36,6 @@ defmodule TravSalesExperiment do
   	Float.pow(dx * dx + dy * dy, 0.5)
   end
 
-  # TODO recurse this once computation is fixed
   def _calc_distance(dist_acc, _, [], _), do: dist_acc
   def _calc_distance(dist_acc, curr_city, possible_next_cities, [next_gene | remaining_genes]) do
   	{ next_city, remaining_cities } = List.pop_at(possible_next_cities, next_gene)
@@ -45,5 +44,11 @@ defmodule TravSalesExperiment do
 
   def calc_distance(genes, cities) do
   	_calc_distance(0.0, nil, cities, genes)
+  end
+
+  @impl Experiment
+  def cull_population(population, keep_portion) do
+  	# dumb strategy for the moment
+  	%Population{ population | members: Enum.take(population.members, floor(Enum.count(population.members) * keep_portion))}
   end
 end
