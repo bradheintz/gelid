@@ -23,7 +23,7 @@ defmodule TravSalesExperiment do
   def score(individual, domain) do
   	max_possible = (Enum.count(domain.cities) - 1) * Float.pow(2.0, 0.5)
   	actual_distance = calc_distance(individual.genes, domain.cities) # going from generic to specific here
-  	%Individual{individual | fitness: max_possible - actual_distance}
+  	%Individual{ individual | fitness: max_possible - actual_distance }
   end
 
 

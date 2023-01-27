@@ -20,6 +20,7 @@ HAPPENING NOW
 * add license
 * add second experiment, perhaps factoring or something weird?
 * move abstract stuff (experiment, population modules) to Gelid. namespace
+* will things go faster if i have a cached dual representation of the genes so i don't have to use pop_at every time?
 
 
 REFACTOR

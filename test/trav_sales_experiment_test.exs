@@ -66,4 +66,9 @@ defmodule TravSalesExperimentTest do
     assert floor(Enum.count(test_pop.members) * @test_keep_portion) == Enum.count(test_result.members)
     assert test_result.target_size == test_pop.target_size
   end
+
+  # reproduction
+  test "exposes a function that takes two population members and returns a third" do
+    flunk("assert something here")
+  end
 end

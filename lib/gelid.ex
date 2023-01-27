@@ -1,14 +1,4 @@
 defmodule Gelid do
-  # TODO should i pass in just the fn instead of the whole experiment?
-  # experiment becomes a binder for all steps if i include everywhere
-  # including just the fn is more generic
-  # but i also don't think i'm looking to reuse heavily outside here...
-  def add_pop(pop_list, _, 0, _), do: pop_list
-  def add_pop(pop_list, experiment, num_left, gene_count) do
-    add_pop([experiment.new_individual(gene_count) | pop_list], experiment, num_left - 1, gene_count)
-  end
-
-
   def run(experiment, hyperparams) do
     pop_size = Keyword.get(hyperparams, :population_size) || raise ArgumentError, "Specify :population_size in hyperparams"
     max_gens = Keyword.get(hyperparams, :max_generations) || raise ArgumentError, "Specify :max_generations in hyperparams"
@@ -26,8 +16,9 @@ defmodule Gelid do
   end
 
   def init_population(experiment, pop_size, gene_count) do
-    pop_list = add_pop([], experiment, pop_size, gene_count)
-    %Population{members: pop_list, target_size: pop_size}
+    pop_members = Stream.repeatedly(fn -> experiment.new_individual(gene_count) end)
+      |> Enum.take(pop_size)
+    %Population{members: pop_members, target_size: pop_size}
   end
 
   def score_list(scored, [], _, _), do: scored
@@ -37,11 +28,9 @@ defmodule Gelid do
   end
 
   def score(experiment, population, domain) do
-    # TODO do this in a more elixirish way with |> operator
-    individuals_to_score = population.members
-    scored_individuals = score_list([], individuals_to_score, experiment, domain)
-    sorted_individuals = Enum.sort_by(scored_individuals, &(&1).fitness, :desc)
-    %Population{population | members: sorted_individuals}
+    scored_and_sorted_individuals = score_list([], population.members, experiment, domain)
+      |> Enum.sort_by(&(&1).fitness, :desc)
+    %Population{population | members: scored_and_sorted_individuals}
   end
 
   def cull_population(experiment, population, keep_portion) do

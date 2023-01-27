@@ -79,6 +79,15 @@ defmodule GelidTest do
     assert Enum.count(test_result.members) == floor(Enum.count(test_pop.members) * @test_keep_portion)
   end
 
+  test "has a step that calls strategy from experiment to refill the population via sexual reproduction of the remaining members" do
+    # make a test pop with fewer members than its own target size
+    # pass it in
+    # verify something comes back
+    # TODO this isn't right - this is 100% an implementation test, when we really just need to verify that the experiment gets called
+    # TODO making sure the experiment's method gets called is a PITA and not covered by ExUnit and I might have to fucking fix that
+    flunk "assert something"
+  end
+
 
   # TEST experiment stops after some default number of generations (spec'able in hparams) if termination criteria not hit
 
