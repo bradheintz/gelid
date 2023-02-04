@@ -36,4 +36,12 @@ defmodule Gelid do
   def cull_population(experiment, population, keep_portion) do
     experiment.cull_population(population, keep_portion)
   end
+
+  def repopulate(experiment, population) do
+    old_members = population.members
+    start_count = Enum.count(old_members)
+    new_members = Stream.repeatedly(fn -> experiment.mix_genes(Enum.fetch!(old_members, :rand.uniform(start_count) - 1), Enum.fetch!(old_members, :rand.uniform(start_count) - 1)) end)
+      |> Enum.take(population.target_size - start_count)
+    %Population{ population | members: old_members ++ new_members }
+  end
 end

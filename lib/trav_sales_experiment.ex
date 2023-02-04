@@ -51,4 +51,13 @@ defmodule TravSalesExperiment do
   	# dumb strategy for the moment
   	%Population{ population | members: Enum.take(population.members, floor(Enum.count(population.members) * keep_portion))}
   end
+
+  @impl Experiment
+  def mix_genes(parent1, parent2) do
+    # crossover
+    cross_idx = :rand.uniform(length(parent1.genes)) # TODO this leaves open the possibility of a clone - fix that?
+    # NB right now this just creates one offspring
+    {{ hchild, _ }, { _, tchild }} = { Enum.split(parent1.genes, cross_idx), Enum.split(parent2.genes, cross_idx) }
+    %Individual{ genes: hchild ++ tchild }
+  end
 end

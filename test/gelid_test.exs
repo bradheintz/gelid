@@ -11,6 +11,8 @@ defmodule GelidTest do
     def score(i, _), do: %Individual{i | fitness: :rand.uniform()}
     @impl Experiment
     def cull_population(population, keep_portion), do: %Population{ population | members: Enum.take(population.members, floor(Enum.count(population.members) * keep_portion))}
+    @impl Experiment
+    def mix_genes(parent1, _), do: parent1
   end
 
   @test_pop_size 321
@@ -81,11 +83,18 @@ defmodule GelidTest do
 
   test "has a step that calls strategy from experiment to refill the population via sexual reproduction of the remaining members" do
     # make a test pop with fewer members than its own target size
-    # pass it in
-    # verify something comes back
-    # TODO this isn't right - this is 100% an implementation test, when we really just need to verify that the experiment gets called
-    # TODO making sure the experiment's method gets called is a PITA and not covered by ExUnit and I might have to fucking fix that
-    flunk "assert something"
+    test_pop_size = 10
+    test_target_size = 20
+    test_pop = %Population{ Gelid.init_population(TestExperiment, test_pop_size, @test_gene_size) | target_size: test_target_size}
+
+    test_result = Gelid.repopulate(TestExperiment, test_pop)
+
+    assert %Population{} = test_result
+    assert Enum.count(test_result.members) == test_target_size
+  end
+
+  test "has a step that mutates some of the new individuals" do
+    flunk "no test yet"
   end
 
 
@@ -95,7 +104,7 @@ defmodule GelidTest do
   #  start lifecycle
   #  √ score & rank population - gather mean score, best this gen, GOAT
   #  √ select a portion of the population to reproduce - a 0-1 set in hyperparams, algo to be provided experiment
-  #  repopulate - use crossover or other sexual repro - spec in experiment?
+  #  √ repopulate - use crossover or other sexual repro - spec in experiment?
   #  mutate
   #  continue lifecycle until we stabilize, or hit max generations
 

@@ -67,12 +67,18 @@ defmodule TravSalesExperimentTest do
 
   # reproduction
   test "exposes a function that takes two population members and returns a third" do
-    flunk("assert something here")
+    test_parent1 = TravSalesExperiment.new_individual(@test_domain_size)
+    test_parent2 = TravSalesExperiment.new_individual(@test_domain_size)
+
+    test_result = TravSalesExperiment.mix_genes(test_parent1, test_parent2)
+
+    assert %Individual{} = test_result
+    # tough to test more than that, b/c randomness
   end
 
   # mutation
   test "exposes a function to mutate genes of a population member" do
-    # only do for unscored members
-    # TODO
+    # NB only do for unscored members
+    flunk("assert something here")
   end
 end
