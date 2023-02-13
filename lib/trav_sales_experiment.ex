@@ -60,4 +60,9 @@ defmodule TravSalesExperiment do
     {{ hchild, _ }, { _, tchild }} = { Enum.split(parent1.genes, cross_idx), Enum.split(parent2.genes, cross_idx) }
     %Individual{ genes: hchild ++ tchild }
   end
+
+  @impl Experiment
+  def mutate_one_gene(ind) do
+    ind
+  end
 end

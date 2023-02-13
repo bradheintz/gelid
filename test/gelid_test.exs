@@ -13,6 +13,8 @@ defmodule GelidTest do
     def cull_population(population, keep_portion), do: %Population{ population | members: Enum.take(population.members, floor(Enum.count(population.members) * keep_portion))}
     @impl Experiment
     def mix_genes(parent1, _), do: parent1
+    @impl Experiment
+    def mutate_one_gene(ind), do: ind
   end
 
   @test_pop_size 321

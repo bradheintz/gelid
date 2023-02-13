@@ -8,10 +8,10 @@ defmodule TravSalesExperimentTest do
   @test_map %CityMap{cities: [[0.0, 0.0], [0.1, 0.0], [0.2, 0.0]]}
 
   test "exposes a function to give a single population member" do
-    test_domain_size = 5
-    test_result = TravSalesExperiment.new_individual(test_domain_size)
+    test_result = TravSalesExperiment.new_individual(@test_domain_size)
+
     assert %Individual{} = test_result
-    assert Enum.count(test_result.genes) == test_domain_size # TODO currently hardcoded, which is bad - needs to be config
+    assert Enum.count(test_result.genes) == @test_domain_size # TODO currently hardcoded, which is bad - needs to be config
     assert test_result.age == 0
   end
 
@@ -50,6 +50,7 @@ defmodule TravSalesExperimentTest do
   # distance calculations
   test "correctly computes distance for a single segment" do
     test_result = TravSalesExperiment._calc_distance(0.0, [0.1, 0.1], [[0.1, 0.2]], [0])
+
     assert_in_delta test_result, 0.1, @test_delta
   end
 
@@ -60,6 +61,7 @@ defmodule TravSalesExperimentTest do
     test_pop = %Population{ members: test_pop_members, target_size: @test_population_size }
 
     test_result = TravSalesExperiment.cull_population(test_pop, @test_keep_portion)
+
     assert %Population{} = test_result
     assert floor(Enum.count(test_pop.members) * @test_keep_portion) == Enum.count(test_result.members)
     assert test_result.target_size == test_pop.target_size
@@ -78,7 +80,12 @@ defmodule TravSalesExperimentTest do
 
   # mutation
   test "exposes a function to mutate genes of a population member" do
-    # NB only do for unscored members
-    flunk("assert something here")
+    test_individual = TravSalesExperiment.new_individual(@test_domain_size)
+
+    test_result = TravSalesExperiment.mutate_one_gene(test_individual)
+
+    assert %Individual{} = test_result
+
+    flunk("assert that exactly one gene has changed")
   end
 end
