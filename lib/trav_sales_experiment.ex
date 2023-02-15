@@ -68,7 +68,7 @@ defmodule TravSalesExperiment do
 
   @impl Experiment
   def mutate_one_gene(ind) do
-    l = length(ind.genes)
+    l = length(ind.genes) - 1 # because last gene never changes
     mutuation_idx = :rand.uniform(l)
     new_value = :rand.uniform(l - mutuation_idx)
     %Individual{ genes: List.replace_at(ind.genes, mutuation_idx, new_value)}

@@ -2,6 +2,7 @@ UNDERWAY
 - mutations are done, which means i can start stringing the workflow together
 - BUT FIRST some cleanup and refactoring
 - AND MAYBE SECOND some elixirization of the code
+- also do more around validation of mutation step - maybe w/ rand seed?
 
 
 

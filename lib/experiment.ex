@@ -1,5 +1,5 @@
 defmodule Experiment do
-  @callback new_individual(gene_count :: integer) :: Enum.t
+  @callback new_individual(gene_count :: integer) :: Individual.t
   @callback new_domain(domain_size :: integer) :: Domain
   @callback score(individual :: Individual.t, domain :: any) :: float
   @callback cull_population(population :: Population.t, keep_portion :: float) :: Population.t
