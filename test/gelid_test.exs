@@ -35,6 +35,8 @@ defmodule GelidTest do
 
   test "run(): returned pop's member list size matches population_size hyperparam & its own population_size field" do
     test_result = Gelid.run(TestExperiment, @test_hyperparams)
+
+    assert %Population{ experiment: TestExperiment } = test_result
     assert test_result.target_size == @test_pop_size
     assert Enum.count(test_result.members) == @test_pop_size
   end
@@ -47,6 +49,7 @@ defmodule GelidTest do
   end
 
   test "run(): if poulation_size is not specified in hyperparams, raise" do
+    # always the tension between atomicity and duplication
     assert_hyperparam_checked(:population_size)
     assert_hyperparam_checked(:max_generations)
     assert_hyperparam_checked(:gene_count)
@@ -60,6 +63,7 @@ defmodule GelidTest do
     # TODO yeah this is a bit of an implementation test so sue me
     test_result = Gelid.init_population(TestExperiment, @test_pop_size, @test_gene_size)
 
+    assert %Population{ experiment: TestExperiment } = test_result
     assert test_result.target_size == @test_pop_size
     assert Enum.count(test_result.members) == @test_pop_size
     assert %Individual{} = List.first(test_result.members)
@@ -69,7 +73,7 @@ defmodule GelidTest do
     test_pop = Gelid.init_population(TestExperiment, @test_pop_size, @test_gene_size)
     test_domain = TestExperiment.new_domain(@test_domain_size)
 
-    test_result = Gelid.score(test_pop, TestExperiment, test_domain)
+    test_result = Gelid.score(test_pop, test_domain)
     
     assert %Population{} = test_result
     assert Enum.count(test_result.members) == Enum.count(test_pop.members)
@@ -80,7 +84,7 @@ defmodule GelidTest do
   test "has a step that calls strategy from experiment to cull a proportion of the population specified in hyperparameters" do
     test_pop = Gelid.init_population(TestExperiment, 100, @test_gene_size)
 
-    test_result = Gelid.cull_population(test_pop, TestExperiment, @test_keep_portion)
+    test_result = Gelid.cull_population(test_pop, @test_keep_portion)
 
     assert %Population{} = test_result
     assert Enum.count(test_result.members) == floor(Enum.count(test_pop.members) * @test_keep_portion)
@@ -92,7 +96,7 @@ defmodule GelidTest do
     test_target_size = 20
     test_pop = %Population{ Gelid.init_population(TestExperiment, test_pop_size, @test_gene_size) | target_size: test_target_size}
 
-    test_result = Gelid.repopulate(test_pop, TestExperiment, @test_mutation_rate)
+    test_result = Gelid.repopulate(test_pop, @test_mutation_rate)
 
     assert %Population{} = test_result
     assert length(test_result.members) == test_target_size
