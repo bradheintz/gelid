@@ -1,9 +1,13 @@
 defmodule Gelid do
+  def gethp(hyperparams, k) do
+    Keyword.get(hyperparams, k) || raise ArgumentError, "Specify #{k} in hyperparameters"
+  end
+
   def run(experiment, hyperparams) do
-    pop_size = Keyword.get(hyperparams, :population_size) || raise ArgumentError, "Specify :population_size in hyperparams"
-    max_gens = Keyword.get(hyperparams, :max_generations) || raise ArgumentError, "Specify :max_generations in hyperparams"
-    gene_count = Keyword.get(hyperparams, :gene_count) || raise ArgumentError, "Specify :gene_count in hyperparams"
-    mutation_rate = Keyword.get(hyperparams, :mutation_rate) || raise ArgumentError, "Specify :mutation_rate in hyperparams"
+    pop_size = gethp(hyperparams, :population_size)
+    _max_gens = gethp(hyperparams, :max_generations)
+    gene_count = gethp(hyperparams, :gene_count)
+    _mutation_rate = gethp(hyperparams, :mutation_rate)
 
     init_population(experiment, pop_size, gene_count)
     # create population, then
