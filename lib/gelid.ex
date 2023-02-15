@@ -43,9 +43,11 @@ defmodule Gelid do
 
   def repopulate(experiment, population, mutation_rate) do
     old_members = population.members
-    start_count = Enum.count(old_members)
+    start_count = length(old_members)
+
     new_members = Stream.repeatedly(fn -> experiment.mix_genes(Enum.fetch!(old_members, :rand.uniform(start_count) - 1), Enum.fetch!(old_members, :rand.uniform(start_count) - 1), mutation_rate) end)
       |> Enum.take(population.target_size - start_count)
+
     %Population{ population | members: old_members ++ new_members }
   end
 end

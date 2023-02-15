@@ -21,18 +21,18 @@ defmodule TravSalesExperiment do
   @impl Experiment
   def score(individual, _) when individual.fitness > 0.0, do: individual
   def score(individual, domain) do
-  	max_possible = (Enum.count(domain.cities) - 1) * Float.pow(2.0, 0.5)
+  	max_possible = (length(domain.cities) - 1) * Float.pow(2.0, 0.5)
   	actual_distance = calc_distance(individual.genes, domain.cities) # going from generic to specific here
+
   	%Individual{ individual | fitness: max_possible - actual_distance }
   end
 
 
   def _two_city_distance(nil, _), do: 0.0
-  def _two_city_distance(c1, c2) do
-  	[c1x,c1y] = c1
-  	[c2x,c2y] = c2
+  def _two_city_distance([c1x,c1y], [c2x,c2y]) do
   	dx = c1x - c2x
   	dy = c1y - c2y
+
   	Float.pow(dx * dx + dy * dy, 0.5)
   end
 
@@ -52,13 +52,8 @@ defmodule TravSalesExperiment do
   	%Population{ population | members: Enum.take(population.members, floor(Enum.count(population.members) * keep_portion))}
   end
 
-  @impl Experiment
-  def mix_genes(parent1, parent2, mutation_rate) do
-    # crossover
-    cross_idx = :rand.uniform(length(parent1.genes)) # TODO this leaves open the possibility of a clone - fix that?
-    # NB right now this just creates one offspring
-    {{ hchild, _ }, { _, tchild }} = { Enum.split(parent1.genes, cross_idx), Enum.split(parent2.genes, cross_idx) }
-    new_child = %Individual{ genes: hchild ++ tchild }
+
+  def maybe_mutate(new_child, mutation_rate) do
     if :rand.uniform() < mutation_rate do
       mutate_one_gene(new_child)
     else
@@ -67,10 +62,21 @@ defmodule TravSalesExperiment do
   end
 
   @impl Experiment
+  def mix_genes(parent1, parent2, mutation_rate) do
+    # crossover
+    cross_idx = :rand.uniform(length(parent1.genes)) # TODO this leaves open the possibility of a clone - fix that?
+    # NB right now this just creates one offspring - this intentional, but is as potential point of change to open
+
+    {{ hchild, _ }, { _, tchild }} = { Enum.split(parent1.genes, cross_idx), Enum.split(parent2.genes, cross_idx) }
+
+    %Individual{ genes: hchild ++ tchild } |> maybe_mutate(mutation_rate)
+  end
+
+  @impl Experiment
   def mutate_one_gene(ind) do
     l = length(ind.genes) - 1 # because last gene never changes
-    mutuation_idx = :rand.uniform(l)
-    new_value = :rand.uniform(l - mutuation_idx)
+    mutuation_idx = :rand.uniform(l) - 1
+    new_value = :rand.uniform(l - mutuation_idx) - 1
     %Individual{ genes: List.replace_at(ind.genes, mutuation_idx, new_value)}
   end
 end
