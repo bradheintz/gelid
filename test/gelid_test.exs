@@ -15,16 +15,17 @@ defmodule GelidTest do
     def mix_genes(parent1, _, _), do: parent1
     @impl Experiment
     def mutate_one_gene(ind), do: ind
+    @impl Experiment
     def done?(generation_number), do: generation_number >= 10
   end
 
   @test_pop_size 321
   @test_keep_portion 0.4
   @test_mutation_rate 0.01
-  @test_hyperparams [ population_size: @test_pop_size, max_generations: 10, gene_count: 5, keep_portion: @test_keep_portion, mutation_rate: @test_mutation_rate ]
-
   @test_domain_size 5
-  @test_gene_size 7
+  @test_gene_size 5 # TODO for trav sales these are the same, in other cases not
+  @test_hyperparams [ population_size: @test_pop_size, max_generations: 10, gene_count: @test_gene_size, keep_portion: @test_keep_portion, mutation_rate: @test_mutation_rate, domain_size: @test_domain_size ]
+
 
   # RUNNING AN EXPERIMENT
   test "run(): runs an experiment and returns a population" do
@@ -47,24 +48,18 @@ defmodule GelidTest do
 
   test "run(): if poulation_size is not specified in hyperparams, raise" do
     assert_hyperparam_checked(:population_size)
-  end
-
-  test "run(): if max_generations not specified in hyperparams, raise" do
     assert_hyperparam_checked(:max_generations)
-  end
-
-  test "run(): if gene_count not specified in hyperparams, raise" do
     assert_hyperparam_checked(:gene_count)
-  end
-
-  test "run(): if mutation_rate not specified in hyperparams, raise" do
     assert_hyperparam_checked(:mutation_rate)
+    assert_hyperparam_checked(:domain_size)
+    assert_hyperparam_checked(:keep_portion)
   end
 
   # ALGORITHM STEPS
   test "has a step that creates a population with specified size and creation fn" do
     # TODO yeah this is a bit of an implementation test so sue me
     test_result = Gelid.init_population(TestExperiment, @test_pop_size, @test_gene_size)
+
     assert test_result.target_size == @test_pop_size
     assert Enum.count(test_result.members) == @test_pop_size
     assert %Individual{} = List.first(test_result.members)
@@ -74,7 +69,7 @@ defmodule GelidTest do
     test_pop = Gelid.init_population(TestExperiment, @test_pop_size, @test_gene_size)
     test_domain = TestExperiment.new_domain(@test_domain_size)
 
-    test_result = Gelid.score(TestExperiment, test_pop, test_domain)
+    test_result = Gelid.score(test_pop, TestExperiment, test_domain)
     
     assert %Population{} = test_result
     assert Enum.count(test_result.members) == Enum.count(test_pop.members)
@@ -85,7 +80,7 @@ defmodule GelidTest do
   test "has a step that calls strategy from experiment to cull a proportion of the population specified in hyperparameters" do
     test_pop = Gelid.init_population(TestExperiment, 100, @test_gene_size)
 
-    test_result = Gelid.cull_population(TestExperiment, test_pop, @test_keep_portion)
+    test_result = Gelid.cull_population(test_pop, TestExperiment, @test_keep_portion)
 
     assert %Population{} = test_result
     assert Enum.count(test_result.members) == floor(Enum.count(test_pop.members) * @test_keep_portion)
@@ -97,7 +92,7 @@ defmodule GelidTest do
     test_target_size = 20
     test_pop = %Population{ Gelid.init_population(TestExperiment, test_pop_size, @test_gene_size) | target_size: test_target_size}
 
-    test_result = Gelid.repopulate(TestExperiment, test_pop, @test_mutation_rate)
+    test_result = Gelid.repopulate(test_pop, TestExperiment, @test_mutation_rate)
 
     assert %Population{} = test_result
     assert length(test_result.members) == test_target_size

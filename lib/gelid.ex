@@ -5,21 +5,24 @@ defmodule Gelid do
 
   def run(experiment, hyperparams) do
     pop_size = gethp(hyperparams, :population_size)
-    _max_gens = gethp(hyperparams, :max_generations)
+    max_gens = gethp(hyperparams, :max_generations)
     gene_count = gethp(hyperparams, :gene_count)
-    _mutation_rate = gethp(hyperparams, :mutation_rate)
+    mutation_rate = gethp(hyperparams, :mutation_rate)
+    domain_size = gethp(hyperparams, :domain_size)
+    keep_portion = gethp(hyperparams, :keep_portion)
 
+    domain = experiment.new_domain(domain_size)
     init_population(experiment, pop_size, gene_count)
-    # create population, then
-    #  start lifecycle
-    #  score & rank population - gather mean score, best this gen, GOAT
-    #  select/cull?
-    #  repopulate - use crossover or other sexual mutation - spec in experiment?
-    #  mutate
-    #  continue lifecycle until we stabilize, or hit max generations
+      |> advance_generations_until_done(experiment, domain, keep_portion, mutation_rate, 0, max_gens)
   end
 
-  def advance_generations_until_done(population, experiment) do
+  def advance_generations_until_done(population, _, _, _, _, gen_num, gen_max) when gen_num >= gen_max, do: population
+  def advance_generations_until_done(population, experiment, domain, keep_portion, mutation_rate, gen_num, gen_max) do
+      population |> score(experiment, domain)
+        |> cull_population(experiment, keep_portion)
+        |> repopulate(experiment, mutation_rate)
+        # report/dump state
+        |> advance_generations_until_done(experiment, domain, keep_portion, mutation_rate, gen_num + 1, gen_max)
   end
 
   def init_population(experiment, pop_size, gene_count) do
@@ -33,7 +36,7 @@ defmodule Gelid do
     [experiment.score(next_unscored, domain) | score_list(remaining_unscored, experiment, domain)]
   end
 
-  def score(experiment, population, domain) do
+  def score(population, experiment, domain) do
     scored_and_sorted_individuals = population.members
       |> score_list(experiment, domain)
       |> Enum.sort_by(&(&1).fitness, :desc)
@@ -41,11 +44,11 @@ defmodule Gelid do
     %Population{population | members: scored_and_sorted_individuals}
   end
 
-  def cull_population(experiment, population, keep_portion) do
+  def cull_population(population, experiment, keep_portion) do
     experiment.cull_population(population, keep_portion)
   end
 
-  def repopulate(experiment, population, mutation_rate) do
+  def repopulate(population, experiment, mutation_rate) do
     old_members = population.members
     start_count = length(old_members)
 

@@ -1,8 +1,9 @@
 UNDERWAY
-- mutations are done, which means i can start stringing the workflow together
-- BUT FIRST some cleanup and refactoring
-- AND MAYBE SECOND some elixirization of the code
+- starting to string the workflow together
+- population may need to own experiment as attr so i can pipeline shit
 - also do more around validation of mutation step - maybe w/ rand seed?
+- take the generation check out of done?() and keep in framework as safeguard
+- figure out how to make done?() work on more complex conditions including possibly moving averages
 
 
 
