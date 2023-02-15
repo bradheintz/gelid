@@ -18,7 +18,9 @@ defmodule TravSalesExperimentTest do
 
   test "exposes a function to give a new domain instance" do
     test_domain_size = 5
+
     test_result = TravSalesExperiment.new_domain(test_domain_size)
+
     # TODO right now, this is a very specific type - not sure how to make a generic "domain", but need to keep framework dumb about this type
     assert %CityMap{} = test_result
     assert Enum.count(test_result.cities) == test_domain_size
@@ -28,6 +30,7 @@ defmodule TravSalesExperimentTest do
     test_individual = %Individual{genes: [0,0,0]} # traverses the three cities in list order
 
     test_result = TravSalesExperiment.score(test_individual, @test_map)
+
     assert %Individual{} = test_result
     assert_in_delta test_result.fitness, 2.62842712, @test_delta
 
@@ -35,6 +38,7 @@ defmodule TravSalesExperimentTest do
     test_individual2 = %Individual{genes: [0,1,0]}
 
     test_result = TravSalesExperiment.score(test_individual2, @test_map)
+
     assert_in_delta test_result.fitness, 2.52842712, @test_delta
   end
 
@@ -44,13 +48,14 @@ defmodule TravSalesExperimentTest do
     test_individual = %Individual{ genes: [0,0,0], fitness: impossible_score }
 
     test_result = TravSalesExperiment.score(test_individual, @test_map)
+
     assert %Individual{} = test_result
     assert_in_delta test_result.fitness, impossible_score, @test_delta
   end
 
   # distance calculations
   test "correctly computes distance for a single segment" do
-    test_result = TravSalesExperiment._calc_distance(0.0, [0.1, 0.1], [[0.1, 0.2]], [0])
+    test_result = TravSalesExperiment._calc_distance([0.1, 0.1], [[0.1, 0.2]], [0])
 
     assert_in_delta test_result, 0.1, @test_delta
   end
@@ -103,5 +108,10 @@ defmodule TravSalesExperimentTest do
     # assert 1 == change_count
 
     # TODO should i had a sentry for the correctness of the change?
+  end
+
+  test "tells us when it's done" do
+    refute TravSalesExperiment.done?(9)
+    assert TravSalesExperiment.done?(10)
   end
 end

@@ -19,21 +19,25 @@ defmodule Gelid do
     #  continue lifecycle until we stabilize, or hit max generations
   end
 
+  def advance_generations_until_done(population, experiment) do
+  end
+
   def init_population(experiment, pop_size, gene_count) do
     pop_members = Stream.repeatedly(fn -> experiment.new_individual(gene_count) end)
       |> Enum.take(pop_size)
     %Population{members: pop_members, target_size: pop_size}
   end
 
-  def score_list(scored, [], _, _), do: scored
-  def score_list(scored, [next_unscored | remaining_unscored], experiment, domain) do
-    new_scored = experiment.score(next_unscored, domain)
-    score_list(scored ++ [new_scored], remaining_unscored, experiment, domain)
+  def score_list([], _, _), do: []
+  def score_list([next_unscored | remaining_unscored], experiment, domain) do
+    [experiment.score(next_unscored, domain) | score_list(remaining_unscored, experiment, domain)]
   end
 
   def score(experiment, population, domain) do
-    scored_and_sorted_individuals = score_list([], population.members, experiment, domain)
+    scored_and_sorted_individuals = population.members
+      |> score_list(experiment, domain)
       |> Enum.sort_by(&(&1).fitness, :desc)
+
     %Population{population | members: scored_and_sorted_individuals}
   end
 

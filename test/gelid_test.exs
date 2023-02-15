@@ -15,6 +15,7 @@ defmodule GelidTest do
     def mix_genes(parent1, _, _), do: parent1
     @impl Experiment
     def mutate_one_gene(ind), do: ind
+    def done?(generation_number), do: generation_number >= 10
   end
 
   @test_pop_size 321
