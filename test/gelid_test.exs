@@ -12,14 +12,15 @@ defmodule GelidTest do
     @impl Experiment
     def cull_population(population, keep_portion), do: %Population{ population | members: Enum.take(population.members, floor(Enum.count(population.members) * keep_portion))}
     @impl Experiment
-    def mix_genes(parent1, _), do: parent1
+    def mix_genes(parent1, _, _), do: parent1
     @impl Experiment
     def mutate_one_gene(ind), do: ind
   end
 
   @test_pop_size 321
   @test_keep_portion 0.4
-  @test_hyperparams [ population_size: @test_pop_size, max_generations: 10, gene_count: 5, keep_portion: @test_keep_portion ]
+  @test_mutation_rate 0.01
+  @test_hyperparams [ population_size: @test_pop_size, max_generations: 10, gene_count: 5, keep_portion: @test_keep_portion, mutation_rate: @test_mutation_rate ]
 
   @test_domain_size 5
   @test_gene_size 7
@@ -55,6 +56,10 @@ defmodule GelidTest do
     assert_hyperparam_checked(:gene_count)
   end
 
+  test "run(): if mutation_rate not specified in hyperparams, raise" do
+    assert_hyperparam_checked(:mutation_rate)
+  end
+
   # ALGORITHM STEPS
   test "has a step that creates a population with specified size and creation fn" do
     # TODO yeah this is a bit of an implementation test so sue me
@@ -78,7 +83,9 @@ defmodule GelidTest do
 
   test "has a step that calls strategy from experiment to cull a proportion of the population specified in hyperparameters" do
     test_pop = Gelid.init_population(TestExperiment, 100, @test_gene_size)
+
     test_result = Gelid.cull_population(TestExperiment, test_pop, @test_keep_portion)
+
     assert %Population{} = test_result
     assert Enum.count(test_result.members) == floor(Enum.count(test_pop.members) * @test_keep_portion)
   end
@@ -89,14 +96,14 @@ defmodule GelidTest do
     test_target_size = 20
     test_pop = %Population{ Gelid.init_population(TestExperiment, test_pop_size, @test_gene_size) | target_size: test_target_size}
 
-    test_result = Gelid.repopulate(TestExperiment, test_pop)
+    test_result = Gelid.repopulate(TestExperiment, test_pop, @test_mutation_rate)
 
     assert %Population{} = test_result
-    assert Enum.count(test_result.members) == test_target_size
+    assert length(test_result.members) == test_target_size
   end
 
-  test "has a step that mutates some of the new individuals" do
-    flunk "no test yet"
+  test "dumps data for each step" do
+    flunk "what do i need for tracking and visualization?"
   end
 
 

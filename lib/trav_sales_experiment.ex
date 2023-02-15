@@ -53,16 +53,24 @@ defmodule TravSalesExperiment do
   end
 
   @impl Experiment
-  def mix_genes(parent1, parent2) do
+  def mix_genes(parent1, parent2, mutation_rate) do
     # crossover
     cross_idx = :rand.uniform(length(parent1.genes)) # TODO this leaves open the possibility of a clone - fix that?
     # NB right now this just creates one offspring
     {{ hchild, _ }, { _, tchild }} = { Enum.split(parent1.genes, cross_idx), Enum.split(parent2.genes, cross_idx) }
-    %Individual{ genes: hchild ++ tchild }
+    new_child = %Individual{ genes: hchild ++ tchild }
+    if :rand.uniform() < mutation_rate do
+      mutate_one_gene(new_child)
+    else
+      new_child
+    end
   end
 
   @impl Experiment
   def mutate_one_gene(ind) do
-    ind
+    l = length(ind.genes)
+    mutuation_idx = :rand.uniform(l)
+    new_value = :rand.uniform(l - mutuation_idx)
+    %Individual{ genes: List.replace_at(ind.genes, mutuation_idx, new_value)}
   end
 end

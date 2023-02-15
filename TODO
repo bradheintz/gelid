@@ -1,4 +1,10 @@
-- double-rep of genes - crossover-compatible rep, but also list of city indices
+UNDERWAY
+- mutations are done, which means i can start stringing the workflow together
+- BUT FIRST some cleanup and refactoring
+- AND MAYBE SECOND some elixirization of the code
+
+
+
 
 
 - an individual should have a validity check which is called optionally after mutations or after children are created
@@ -9,9 +15,7 @@ PERF NOTES
 - remember that prepending and popping first are fast w/ elixir lists b/c cons
 
 
-HAPPENING NOW
-- working on the scoring, which means working on the cities...
-
+? double-rep of genes - crossover-compatible rep, but also list of city indices
 
 * need to be able to seed random in *one* place for result repro
 * parallelism

@@ -3,7 +3,7 @@ defmodule Gelid do
     pop_size = Keyword.get(hyperparams, :population_size) || raise ArgumentError, "Specify :population_size in hyperparams"
     max_gens = Keyword.get(hyperparams, :max_generations) || raise ArgumentError, "Specify :max_generations in hyperparams"
     gene_count = Keyword.get(hyperparams, :gene_count) || raise ArgumentError, "Specify :gene_count in hyperparams"
-
+    mutation_rate = Keyword.get(hyperparams, :mutation_rate) || raise ArgumentError, "Specify :mutation_rate in hyperparams"
 
     init_population(experiment, pop_size, gene_count)
     # create population, then
@@ -37,10 +37,10 @@ defmodule Gelid do
     experiment.cull_population(population, keep_portion)
   end
 
-  def repopulate(experiment, population) do
+  def repopulate(experiment, population, mutation_rate) do
     old_members = population.members
     start_count = Enum.count(old_members)
-    new_members = Stream.repeatedly(fn -> experiment.mix_genes(Enum.fetch!(old_members, :rand.uniform(start_count) - 1), Enum.fetch!(old_members, :rand.uniform(start_count) - 1)) end)
+    new_members = Stream.repeatedly(fn -> experiment.mix_genes(Enum.fetch!(old_members, :rand.uniform(start_count) - 1), Enum.fetch!(old_members, :rand.uniform(start_count) - 1), mutation_rate) end)
       |> Enum.take(population.target_size - start_count)
     %Population{ population | members: old_members ++ new_members }
   end

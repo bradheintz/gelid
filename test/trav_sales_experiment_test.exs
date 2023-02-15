@@ -5,6 +5,7 @@ defmodule TravSalesExperimentTest do
   @test_domain_size 5
   @test_keep_portion 0.4
   @test_population_size 300
+  @test_mutation_rate 0.01
   @test_map %CityMap{cities: [[0.0, 0.0], [0.1, 0.0], [0.2, 0.0]]}
 
   test "exposes a function to give a single population member" do
@@ -72,7 +73,7 @@ defmodule TravSalesExperimentTest do
     test_parent1 = TravSalesExperiment.new_individual(@test_domain_size)
     test_parent2 = TravSalesExperiment.new_individual(@test_domain_size)
 
-    test_result = TravSalesExperiment.mix_genes(test_parent1, test_parent2)
+    test_result = TravSalesExperiment.mix_genes(test_parent1, test_parent2, @test_mutation_rate)
 
     assert %Individual{} = test_result
     # tough to test more than that, b/c randomness
@@ -86,6 +87,13 @@ defmodule TravSalesExperimentTest do
 
     assert %Individual{} = test_result
 
-    flunk("assert that exactly one gene has changed")
+    genes_before = test_individual.genes
+    genes_after = test_result.genes
+    l = length(genes_before)
+    assert l == length(genes_after)
+    # TODO there is probably an easier way to express this
+    change_count = Enum.sum(Enum.map(Enum.to_list(0..(l - 1)), fn i -> if Enum.at(genes_before, i) == Enum.at(genes_after, i), do: 0, else: 1 end))
+    assert 1 == change_count
+    # TODO should i had a sentry for the correctness of the change?
   end
 end
