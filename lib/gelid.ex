@@ -94,6 +94,7 @@ defmodule Gelid do
     population
   end
   def report(population, gen_num, step, 4) do # file dump, step is timestamp
-    IO.write('yo yo yo\n')
+    IO.write("Generation #{gen_num}...\n")
+    population
   end
 end
