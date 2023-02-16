@@ -12,7 +12,7 @@ defmodule TravSalesExperimentTest do
     test_result = TravSalesExperiment.new_individual(@test_domain_size)
 
     assert %Individual{} = test_result
-    assert Enum.count(test_result.genes) == @test_domain_size # TODO currently hardcoded, which is bad - needs to be config
+    assert length(test_result.genes) == @test_domain_size # TODO currently hardcoded, which is bad - needs to be config
     assert test_result.age == 0
   end
 
@@ -23,7 +23,7 @@ defmodule TravSalesExperimentTest do
 
     # TODO right now, this is a very specific type - not sure how to make a generic "domain", but need to keep framework dumb about this type
     assert %CityMap{} = test_result
-    assert Enum.count(test_result.cities) == test_domain_size
+    assert length(test_result.cities) == test_domain_size
   end
 
   test "exposes a function that scores a individual against the domain" do
@@ -75,7 +75,7 @@ defmodule TravSalesExperimentTest do
     test_result = TravSalesExperiment.cull_population(test_pop, @test_keep_portion)
 
     assert %Population{} = test_result
-    assert floor(Enum.count(test_pop.members) * @test_keep_portion) == Enum.count(test_result.members)
+    assert floor(length(test_pop.members) * @test_keep_portion) == length(test_result.members)
     assert test_result.target_size == test_pop.target_size
   end
 

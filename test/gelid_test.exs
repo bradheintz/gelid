@@ -10,7 +10,7 @@ defmodule GelidTest do
     @impl Experiment
     def score(i, _), do: %Individual{i | fitness: :rand.uniform()}
     @impl Experiment
-    def cull_population(population, keep_portion), do: %Population{ population | members: Enum.take(population.members, floor(Enum.count(population.members) * keep_portion))}
+    def cull_population(population, keep_portion), do: %Population{ population | members: Enum.take(population.members, floor(length(population.members) * keep_portion))}
     @impl Experiment
     def mix_genes(parent1, _, _), do: parent1
     @impl Experiment
@@ -38,7 +38,7 @@ defmodule GelidTest do
 
     assert %Population{ experiment: TestExperiment } = test_result
     assert test_result.target_size == @test_pop_size
-    assert Enum.count(test_result.members) == @test_pop_size
+    assert length(test_result.members) == @test_pop_size
   end
 
 
@@ -65,7 +65,7 @@ defmodule GelidTest do
 
     assert %Population{ experiment: TestExperiment } = test_result
     assert test_result.target_size == @test_pop_size
-    assert Enum.count(test_result.members) == @test_pop_size
+    assert length(test_result.members) == @test_pop_size
     assert %Individual{} = List.first(test_result.members)
   end
 
@@ -76,7 +76,7 @@ defmodule GelidTest do
     test_result = Gelid.score(test_pop, test_domain)
     
     assert %Population{} = test_result
-    assert Enum.count(test_result.members) == Enum.count(test_pop.members)
+    assert length(test_result.members) == length(test_pop.members)
     [m1 | [m2 | _]] = test_result.members
     assert m1.fitness > m2.fitness
   end
@@ -87,7 +87,7 @@ defmodule GelidTest do
     test_result = Gelid.cull_population(test_pop, @test_keep_portion)
 
     assert %Population{} = test_result
-    assert Enum.count(test_result.members) == floor(Enum.count(test_pop.members) * @test_keep_portion)
+    assert length(test_result.members) == floor(length(test_pop.members) * @test_keep_portion)
   end
 
   test "has a step that calls strategy from experiment to refill the population via sexual reproduction of the remaining members" do

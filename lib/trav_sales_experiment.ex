@@ -55,24 +55,23 @@ defmodule TravSalesExperiment do
   @impl Experiment
   def cull_population(population, keep_portion) do
   	# NB using a dumb strategy for the moment
-  	%Population{ population | members: Enum.take(population.members, floor(Enum.count(population.members) * keep_portion))}
+  	%Population{ population | members: Enum.take(population.members, floor(length(population.members) * keep_portion))}
   end
 
 
   def maybe_mutate(new_child, mutation_rate) do
-    new_child
-    # if :rand.uniform() < mutation_rate do
-    #   mutate_one_gene(new_child)
-    # else
-    #   new_child
-    # end
+    if :rand.uniform() < mutation_rate do
+      mutate_one_gene(new_child)
+    else
+      new_child
+    end
   end
 
   @impl Experiment
   def mix_genes(parent1, parent2, mutation_rate) do
     # crossover
     cross_idx = :rand.uniform(length(parent1.genes)) # TODO this leaves open the possibility of a clone - fix that?
-    # NB right now this just creates one offspring - this intentional, but is as potential point of change to open
+    # NB right now this just creates one offspring - this is intentional, but is a potential point of change to open
 
     {{ hchild, _ }, { _, tchild }} = { Enum.split(parent1.genes, cross_idx), Enum.split(parent2.genes, cross_idx) }
 
