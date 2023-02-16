@@ -54,10 +54,16 @@ defmodule TravSalesExperimentTest do
   end
 
   # distance calculations
-  test "correctly computes distance for a single segment" do
-    test_result = TravSalesExperiment._calc_distance([0.1, 0.1], [[0.1, 0.2]], [0])
+  test "correctly computes distance for trivial path" do
+    test_result = TravSalesExperiment.calc_distance([[0.1, 0.1], [0.1, 0.2]], [0, 0])
 
     assert_in_delta test_result, 0.1, @test_delta
+  end
+
+  test "correctly computes distance for slightly less trivial path" do
+    test_result = TravSalesExperiment.calc_distance([[0.2, 0.1], [0.1, 0.1], [0.1, 0.2]], [0, 0, 0])
+
+    assert_in_delta test_result, 0.2, @test_delta
   end
 
   # who survives to reproduce?

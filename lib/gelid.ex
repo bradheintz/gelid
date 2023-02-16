@@ -1,6 +1,12 @@
 defmodule Gelid do
+  import Bitwise
+
   def gethp(hyperparams, k) do
     Keyword.get(hyperparams, k) || raise ArgumentError, "Specify #{k} in hyperparameters"
+  end
+
+  def gethp(hyperparams, k, default) do
+    Keyword.get(hyperparams, k, default)
   end
 
   def run(experiment, hyperparams) do
@@ -10,10 +16,16 @@ defmodule Gelid do
     mutation_rate = gethp(hyperparams, :mutation_rate)
     domain_size = gethp(hyperparams, :domain_size)
     keep_portion = gethp(hyperparams, :keep_portion)
+    report_mode = gethp(hyperparams, :report_mode, 0) # 0 is nothing output
 
     domain = experiment.new_domain(domain_size)
+    # IO.inspect(domain)
     init_population(experiment, pop_size, gene_count)
-      |> advance_generations_until_done(domain, keep_portion, mutation_rate, 0, max_gens)
+      |> score(domain)
+      |> report(0, report_mode)
+      |> advance_generations_until_done(domain, keep_portion, mutation_rate, report_mode, 1, max_gens)
+      |> score(domain) # one last time
+      |> report(max_gens + 1, report_mode)
   end
 
   def init_population(experiment, pop_size, gene_count) do
@@ -22,13 +34,17 @@ defmodule Gelid do
     %Population{ members: pop_members, target_size: pop_size, experiment: experiment }
   end
 
-  def advance_generations_until_done(population, _, _, _, gen_num, gen_max) when gen_num >= gen_max, do: population
-  def advance_generations_until_done(population, domain, keep_portion, mutation_rate, gen_num, gen_max) do
-      population |> score(domain)
+  def advance_generations_until_done(population, _, _, _, _, gen_num, gen_max) when gen_num >= gen_max, do: population
+  def advance_generations_until_done(population, domain, keep_portion, mutation_rate, report_mode, gen_num, gen_max) do
+      population
+        |> report(gen_num, report_mode &&& 2)
         |> cull_population(keep_portion)
+        |> report(gen_num, report_mode &&& 2)
         |> repopulate(mutation_rate)
-        # TODO report/dump state
-        |> advance_generations_until_done(domain, keep_portion, mutation_rate, gen_num + 1, gen_max)
+        |> report(gen_num, report_mode &&& 2)
+        |> score(domain)
+        |> report(gen_num, report_mode)
+        |> advance_generations_until_done(domain, keep_portion, mutation_rate, report_mode, gen_num + 1, gen_max)
   end
 
   def score_list([], _, _), do: []
@@ -55,5 +71,25 @@ defmodule Gelid do
       |> Enum.take(population.target_size - length(old_members))
 
     %Population{ population | members: old_members ++ new_members }
+  end
+
+  def report(population, _, 0), do: population # silent for automated testing
+  def report(population, gen_num, 2) do # dump raw for debug
+    report(population, gen_num, 1)
+    IO.inspect(population.members)
+
+    population
+  end
+  def report(population, gen_num, 1) do # lo-fi screen dump with max/avg/min
+    scores = Enum.map(population.members, fn x -> x.fitness end)
+    count = length(scores)
+    { min, max } = Enum.min_max(scores)
+    sum = Enum.sum(scores)
+
+    IO.write("\n\nGeneration #{gen_num}:\n")
+    # IO.write("  #{count} members\n")
+    IO.write("  [ MAX | AVG | MIN ] : [ #{max} | #{sum/count} | #{min} ]\n")
+
+    population
   end
 end

@@ -24,7 +24,7 @@ defmodule GelidTest do
   @test_mutation_rate 0.01
   @test_domain_size 5
   @test_gene_size 5 # TODO for trav sales these are the same, in other cases not
-  @test_hyperparams [ population_size: @test_pop_size, max_generations: 10, gene_count: @test_gene_size, keep_portion: @test_keep_portion, mutation_rate: @test_mutation_rate, domain_size: @test_domain_size ]
+  @test_hyperparams [ report_mode: 0, population_size: @test_pop_size, max_generations: 10, gene_count: @test_gene_size, keep_portion: @test_keep_portion, mutation_rate: @test_mutation_rate, domain_size: @test_domain_size ]
 
 
   # RUNNING AN EXPERIMENT

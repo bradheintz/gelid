@@ -6,13 +6,11 @@ defmodule TravSalesExperiment do
 
   @impl Experiment
   def new_individual(gene_count) do
-  	%Individual{ genes: add_genes([], gene_count) }
+  	%Individual{ genes: add_genes(gene_count) }
   end
 
-	def add_genes(genes, 0), do: genes
-	def add_genes(genes, num_left) do
-		add_genes([Enum.random(0..(num_left - 1)) | genes], num_left - 1)
-	end
+  def add_genes(0), do: []
+  def add_genes(genes_left), do: [ :rand.uniform(genes_left) - 1 | add_genes(genes_left - 1) ]
 
 
   @impl Experiment
@@ -24,13 +22,14 @@ defmodule TravSalesExperiment do
   def score(individual, _) when individual.fitness > 0.0, do: individual
   def score(individual, domain) do
   	max_possible = (length(domain.cities) - 1) * Float.pow(2.0, 0.5)
-  	actual_distance = calc_distance(individual.genes, domain.cities) # going from generic to specific here
+    # IO.inspect(individual.genes)
+
+  	actual_distance = calc_distance(domain.cities, individual.genes) # going from generic to specific here
 
   	%Individual{ individual | fitness: max_possible - actual_distance }
   end
 
 
-  def _two_city_distance(nil, _), do: 0.0
   def _two_city_distance([c1x,c1y], [c2x,c2y]) do
   	dx = c1x - c2x
   	dy = c1y - c2y
@@ -38,14 +37,19 @@ defmodule TravSalesExperiment do
   	Float.pow(dx * dx + dy * dy, 0.5)
   end
 
-  def _calc_distance(_, [], _), do: 0
-  def _calc_distance(curr_city, possible_next_cities, [next_gene | remaining_genes]) do
-  	{ next_city, remaining_cities } = List.pop_at(possible_next_cities, next_gene)
-  	_two_city_distance(curr_city, next_city) + _calc_distance(next_city, remaining_cities, remaining_genes)
+  def calc_distance(cities, genes) do
+    [ first_gene | remaining_genes ] = genes
+    { first_city, possible_next_cities } = List.pop_at(cities, first_gene)
+    calc_distance(first_city, possible_next_cities, remaining_genes)
   end
-
-  def calc_distance(genes, cities) do
-  	_calc_distance(nil, cities, genes)
+  def calc_distance(_, [], _), do: 0.0
+  def calc_distance(first_city, possible_next_cities, [first_gene | remaining_genes]) do
+    { next_city, remaining_cities } = List.pop_at(possible_next_cities, first_gene)
+    # IO.write("FIRST CITY\n")
+    # IO.inspect(first_city)
+    # IO.write("NEXT CITY\n")
+    # IO.inspect(next_city)
+    _two_city_distance(first_city, next_city) + calc_distance(next_city, remaining_cities, remaining_genes)
   end
 
   @impl Experiment
@@ -56,11 +60,12 @@ defmodule TravSalesExperiment do
 
 
   def maybe_mutate(new_child, mutation_rate) do
-    if :rand.uniform() < mutation_rate do
-      mutate_one_gene(new_child)
-    else
-      new_child
-    end
+    new_child
+    # if :rand.uniform() < mutation_rate do
+    #   mutate_one_gene(new_child)
+    # else
+    #   new_child
+    # end
   end
 
   @impl Experiment
