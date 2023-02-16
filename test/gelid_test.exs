@@ -102,15 +102,4 @@ defmodule GelidTest do
     assert length(test_result.members) == test_target_size
   end
 
-
-  # TEST experiment stops after some default number of generations (spec'able in hparams) if termination criteria not hit
-
-  # steps of algo - verify experiment is queried properly for each:
-  #  start lifecycle
-  #  √ score & rank population - gather mean score, best this gen, GOAT
-  #  √ select a portion of the population to reproduce - a 0-1 set in hyperparams, algo to be provided experiment
-  #  √ repopulate - use crossover or other sexual repro - spec in experiment?
-  #  mutate
-  #  continue lifecycle until we stabilize, or hit max generations
-
 end
