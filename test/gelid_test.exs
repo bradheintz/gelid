@@ -61,17 +61,18 @@ defmodule GelidTest do
   # ALGORITHM STEPS
   test "has a step that creates a population with specified size and creation fn" do
     # TODO yeah this is a bit of an implementation test so sue me
-    test_result = Gelid.init_population(TestExperiment, @test_pop_size, @test_gene_size)
+    test_result = Gelid.init_population(TestExperiment, [], @test_pop_size, @test_gene_size)
 
     assert %Population{ experiment: TestExperiment } = test_result
     assert test_result.target_size == @test_pop_size
     assert length(test_result.members) == @test_pop_size
+    refute test_result.domain == nil
     assert %Individual{} = List.first(test_result.members)
   end
 
   test "has a step that assigns a score to every individual" do
-    test_pop = Gelid.init_population(TestExperiment, @test_pop_size, @test_gene_size)
     test_domain = TestExperiment.new_domain(@test_domain_size)
+    test_pop = Gelid.init_population(TestExperiment, test_domain, @test_pop_size, @test_gene_size)
 
     test_result = Gelid.score(test_pop, test_domain)
     
@@ -82,7 +83,7 @@ defmodule GelidTest do
   end
 
   test "has a step that calls strategy from experiment to cull a proportion of the population specified in hyperparameters" do
-    test_pop = Gelid.init_population(TestExperiment, 100, @test_gene_size)
+    test_pop = Gelid.init_population(TestExperiment, [], 100, @test_gene_size)
 
     test_result = Gelid.cull_population(test_pop, @test_keep_portion)
 
@@ -94,7 +95,7 @@ defmodule GelidTest do
     # make a test pop with fewer members than its own target size
     test_pop_size = 10
     test_target_size = 20
-    test_pop = %Population{ Gelid.init_population(TestExperiment, test_pop_size, @test_gene_size) | target_size: test_target_size}
+    test_pop = %Population{ Gelid.init_population(TestExperiment, [], test_pop_size, @test_gene_size) | target_size: test_target_size}
 
     test_result = Gelid.repopulate(test_pop, @test_mutation_rate)
 

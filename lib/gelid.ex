@@ -20,8 +20,7 @@ defmodule Gelid do
 
     stamp = Calendar.strftime(DateTime.utc_now(), "%Y%m%d%H%M%SZ")
     domain = experiment.new_domain(domain_size)
-    # IO.inspect(domain)
-    init_population(experiment, pop_size, gene_count)
+    init_population(experiment, domain, pop_size, gene_count)
       |> score(domain)
       |> report(0, "BEGIN", report_mode)
       |> advance_generations_until_done(domain, keep_portion, mutation_rate, report_mode, stamp, 1, max_gens)
@@ -29,10 +28,10 @@ defmodule Gelid do
       |> report(max_gens, "FINAL", report_mode)
   end
 
-  def init_population(experiment, pop_size, gene_count) do
+  def init_population(experiment, domain, pop_size, gene_count) do
     pop_members = Stream.repeatedly(fn -> experiment.new_individual(gene_count) end)
       |> Enum.take(pop_size)
-    %Population{ members: pop_members, target_size: pop_size, experiment: experiment }
+    %Population{ members: pop_members, target_size: pop_size, experiment: experiment, domain: domain }
   end
 
   def advance_generations_until_done(population, _, _, _, _, _, gen_num, gen_max) when gen_num >= gen_max, do: population
