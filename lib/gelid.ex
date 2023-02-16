@@ -22,10 +22,10 @@ defmodule Gelid do
     # IO.inspect(domain)
     init_population(experiment, pop_size, gene_count)
       |> score(domain)
-      |> report(0, report_mode)
+      |> report(0, "BEGIN", report_mode)
       |> advance_generations_until_done(domain, keep_portion, mutation_rate, report_mode, 1, max_gens)
       |> score(domain) # one last time
-      |> report(max_gens + 1, report_mode)
+      |> report(max_gens, "FINAL", report_mode)
   end
 
   def init_population(experiment, pop_size, gene_count) do
@@ -37,13 +37,13 @@ defmodule Gelid do
   def advance_generations_until_done(population, _, _, _, _, gen_num, gen_max) when gen_num >= gen_max, do: population
   def advance_generations_until_done(population, domain, keep_portion, mutation_rate, report_mode, gen_num, gen_max) do
       population
-        |> report(gen_num, report_mode &&& 2)
+        |> report(gen_num, "entering", report_mode &&& 2)
         |> cull_population(keep_portion)
-        |> report(gen_num, report_mode &&& 2)
+        |> report(gen_num, "after cull", report_mode &&& 2)
         |> repopulate(mutation_rate)
-        |> report(gen_num, report_mode &&& 2)
+        |> report(gen_num, "after repopulation", report_mode &&& 2)
         |> score(domain)
-        |> report(gen_num, report_mode)
+        |> report(gen_num, "scored and sorted", report_mode)
         |> advance_generations_until_done(domain, keep_portion, mutation_rate, report_mode, gen_num + 1, gen_max)
   end
 
@@ -73,20 +73,20 @@ defmodule Gelid do
     %Population{ population | members: old_members ++ new_members }
   end
 
-  def report(population, _, 0), do: population # silent for automated testing
-  def report(population, gen_num, 2) do # dump raw for debug
-    report(population, gen_num, 1)
+  def report(population, _, _, 0), do: population # silent for automated testing
+  def report(population, gen_num, step, 2) do # dump raw for debug
+    report(population, gen_num, step, 1)
     IO.inspect(population.members)
 
     population
   end
-  def report(population, gen_num, 1) do # lo-fi screen dump with max/avg/min
+  def report(population, gen_num, step, 1) do # lo-fi screen dump with max/avg/min
     scores = Enum.map(population.members, fn x -> x.fitness end)
     count = length(scores)
     { min, max } = Enum.min_max(scores)
     sum = Enum.sum(scores)
 
-    IO.write("\n\nGeneration #{gen_num}:\n")
+    IO.write("\n\nGeneration #{gen_num} #{step}:\n")
     # IO.write("  #{count} members\n")
     IO.write("  [ MAX | AVG | MIN ] : [ #{max} | #{sum/count} | #{min} ]\n")
 

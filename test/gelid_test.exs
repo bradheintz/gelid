@@ -102,10 +102,6 @@ defmodule GelidTest do
     assert length(test_result.members) == test_target_size
   end
 
-  test "dumps data for each step" do
-    flunk "what do i need for tracking and visualization?"
-  end
-
 
   # TEST experiment stops after some default number of generations (spec'able in hparams) if termination criteria not hit
 
