@@ -21,10 +21,10 @@ defmodule Gelid do
     stamp = Calendar.strftime(DateTime.utc_now(), "%Y%m%d%H%M%SZ")
     domain = experiment.new_domain(domain_size)
     init_population(experiment, domain, pop_size, gene_count)
-      |> score(domain)
+      |> score()
       |> report(0, "BEGIN", report_mode)
-      |> advance_generations_until_done(domain, keep_portion, mutation_rate, report_mode, stamp, 1, max_gens)
-      |> score(domain) # one last time
+      |> advance_generations_until_done(keep_portion, mutation_rate, report_mode, stamp, 1, max_gens)
+      |> score() # one last time
       |> report(max_gens, "FINAL", report_mode)
   end
 
@@ -34,17 +34,18 @@ defmodule Gelid do
     %Population{ members: pop_members, target_size: pop_size, experiment: experiment, domain: domain }
   end
 
-  def advance_generations_until_done(population, _, _, _, _, _, gen_num, gen_max) when gen_num >= gen_max, do: population
-  def advance_generations_until_done(population, domain, keep_portion, mutation_rate, report_mode, stamp, gen_num, gen_max) do
+  def advance_generations_until_done(population, _, _, _, _, gen_num, gen_max) when gen_num >= gen_max, do: population
+  def advance_generations_until_done(population, keep_portion, mutation_rate, report_mode, stamp, gen_num, gen_max) do
       population
         |> report(gen_num, "entering", report_mode &&& 2)
         |> cull_population(keep_portion)
         |> report(gen_num, "after cull", report_mode &&& 2)
         |> repopulate(mutation_rate)
         |> report(gen_num, "after repopulation", report_mode &&& 2)
-        |> score(domain)
-        |> report(gen_num, "scored and sorted", report_mode)
-        |> advance_generations_until_done(domain, keep_portion, mutation_rate, report_mode, stamp, gen_num + 1, gen_max)
+        |> score()
+        |> report(gen_num, "scored and sorted", report_mode &&& 1)
+        |> report(gen_num, stamp, report_mode &&& 4)
+        |> advance_generations_until_done(keep_portion, mutation_rate, report_mode, stamp, gen_num + 1, gen_max)
   end
 
   def score_list([], _, _), do: []
@@ -52,9 +53,9 @@ defmodule Gelid do
     [experiment.score(next_unscored, domain) | score_list(remaining_unscored, experiment, domain)]
   end
 
-  def score(population, domain) do
+  def score(population) do
     scored_and_sorted_individuals = population.members
-      |> score_list(population.experiment, domain)
+      |> score_list(population.experiment, population.domain)
       |> Enum.sort_by(&(&1).fitness, :desc)
 
     %Population{population | members: scored_and_sorted_individuals}
@@ -91,5 +92,8 @@ defmodule Gelid do
     IO.inspect(population.members)
 
     population
+  end
+  def report(population, gen_num, step, 4) do # file dump, step is timestamp
+    IO.write('yo yo yo\n')
   end
 end

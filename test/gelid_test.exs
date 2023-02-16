@@ -74,7 +74,7 @@ defmodule GelidTest do
     test_domain = TestExperiment.new_domain(@test_domain_size)
     test_pop = Gelid.init_population(TestExperiment, test_domain, @test_pop_size, @test_gene_size)
 
-    test_result = Gelid.score(test_pop, test_domain)
+    test_result = Gelid.score(test_pop)
     
     assert %Population{} = test_result
     assert length(test_result.members) == length(test_pop.members)
