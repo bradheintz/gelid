@@ -24,3 +24,6 @@ gelid-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# data files from runs
+/data/

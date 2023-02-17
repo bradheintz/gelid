@@ -1,6 +1,7 @@
 defmodule Gelid do
   import Bitwise
 
+
   def gethp(hyperparams, k) do
     Keyword.get(hyperparams, k) || raise ArgumentError, "Specify #{k} in hyperparameters"
   end
@@ -22,10 +23,10 @@ defmodule Gelid do
     domain = experiment.new_domain(domain_size)
     init_population(experiment, domain, pop_size, gene_count)
       |> score()
-      |> report(0, "BEGIN", report_mode)
+      |> report(0, "#{stamp}-BEGIN", report_mode)
       |> advance_generations_until_done(keep_portion, mutation_rate, report_mode, stamp, 1, max_gens)
       |> score() # one last time
-      |> report(max_gens, "FINAL", report_mode)
+      |> report(max_gens, "#{stamp}-FINAL", report_mode)
   end
 
   def init_population(experiment, domain, pop_size, gene_count) do
@@ -82,8 +83,7 @@ defmodule Gelid do
     sum = Enum.sum(scores)
 
     IO.write("\n\nGeneration #{gen_num} #{step}:\n")
-    # IO.write("  #{count} members\n")
-    IO.write("  [ MAX | AVG | MIN ] : [ #{max} | #{sum/count} | #{min} ]\n")
+    IO.write("  [ MAX | AVG | MIN | COUNT ] : [ #{max} | #{sum/count} | #{min} | #{count} ]\n")
 
     population
   end
@@ -93,8 +93,25 @@ defmodule Gelid do
 
     population
   end
+
+  def _map_route([], _), do: []
+  def _map_route([next_gene | remaining_genes], indices) do
+    { next_index, remaining_indices } = indices |> List.pop_at(next_gene)
+    [ next_index | _map_route(remaining_genes, remaining_indices) ]
+  end
+
+  def _pop_member_kvs(members) do
+    Enum.map(members,
+      fn x -> [age: x.age, score: x.fitness, route: _map_route(x.genes, Enum.to_list(0..(length(x.genes) - 1)))] end
+    )
+  end
+
   def report(population, gen_num, step, 4) do # file dump, step is timestamp
     IO.write("Generation #{gen_num}...\n")
+    expmt = [domain: population.domain.cities, population: _pop_member_kvs(population.members)]
+    {:ok, outjson} = JSON.encode(expmt)
+    outfile = Path.join([File.cwd!(), "/data/", "#{step}-#{gen_num}.json"])
+    File.write!(outfile, outjson)
     population
   end
 end
