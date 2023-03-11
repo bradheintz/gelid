@@ -54,8 +54,8 @@ defmodule TravSalesExperiment do
 
   @impl Experiment
   def cull_population(population, keep_portion) do
-  	# NB using a dumb strategy for the moment
     deduped_members = Enum.dedup_by(population.members, fn x -> x.genes end)
+  	# NB using a dumb strategy for the moment
   	%Population{ population | members: Enum.take(deduped_members, floor(length(population.members) * keep_portion))}
   end
 

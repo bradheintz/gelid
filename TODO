@@ -5,6 +5,8 @@ UNDERWAY
 * pad gen num digits to 6 in output filenames
 * put output files in timestamp subfolders
 - see if i can add a gradient to the path plot in mathematica - tough to follow now
+- in mathematica viz interface, add dropdown or similar for existing data folders
+-- see Fast Introduction for Programmers video about InteractiveInterfaces on wolfram.com/wolfram-u
 
 
 
