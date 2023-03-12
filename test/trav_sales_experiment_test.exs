@@ -7,6 +7,7 @@ defmodule TravSalesExperimentTest do
   @test_population_size 300
   @test_mutation_rate 0.01
   @test_map %CityMap{cities: [[0.0, 0.0], [0.1, 0.0], [0.2, 0.0]]}
+  @test_seed 1729
 
   test "exposes a function to give a single population member" do
     test_result = TravSalesExperiment.new_individual(@test_domain_size)
@@ -119,5 +120,20 @@ defmodule TravSalesExperimentTest do
   test "tells us when it's done" do
     refute TravSalesExperiment.done?(9)
     assert TravSalesExperiment.done?(10)
+  end
+
+  test "allows us to seed the prng" do
+    larger_test_domain_size = 100
+    result = TravSalesExperiment.seed(@test_seed)
+    assert result == :ok
+
+    i1 = TravSalesExperiment.new_individual(larger_test_domain_size)
+
+    result = TravSalesExperiment.seed(@test_seed)
+    assert result == :ok
+
+    i2 = TravSalesExperiment.new_individual(larger_test_domain_size)
+
+    assert i1.genes == i2.genes
   end
 end

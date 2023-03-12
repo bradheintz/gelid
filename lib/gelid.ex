@@ -18,8 +18,10 @@ defmodule Gelid do
     domain_size = gethp(hyperparams, :domain_size)
     keep_portion = gethp(hyperparams, :keep_portion)
     report_mode = gethp(hyperparams, :report_mode, 0) # 0 is nothing output
+    prng_seed = gethp(hyperparams, :seed, 0)
 
     stamp = Calendar.strftime(DateTime.utc_now(), "%Y%m%d%H%M%SZ")
+    experiment.seed(prng_seed)
     domain = experiment.new_domain(domain_size)
     init_population(experiment, domain, pop_size, gene_count)
       |> score()
@@ -93,6 +95,14 @@ defmodule Gelid do
 
     population
   end
+  def report(population, gen_num, step, 4) do # file dump, step is timestamp
+    IO.write("Generation #{gen_num}...\n")
+    expmt = [domain: population.domain.cities, population: _pop_member_kvs(population.members)]
+    {:ok, outjson} = JSON.encode(expmt)
+    outfile = Path.join([File.cwd!(), "/data/", "#{step}-#{gen_num}.json"])
+    File.write!(outfile, outjson)
+    population
+  end
 
   def _map_route([], _), do: []
   def _map_route([next_gene | remaining_genes], indices) do
@@ -106,12 +116,4 @@ defmodule Gelid do
     )
   end
 
-  def report(population, gen_num, step, 4) do # file dump, step is timestamp
-    IO.write("Generation #{gen_num}...\n")
-    expmt = [domain: population.domain.cities, population: _pop_member_kvs(population.members)]
-    {:ok, outjson} = JSON.encode(expmt)
-    outfile = Path.join([File.cwd!(), "/data/", "#{step}-#{gen_num}.json"])
-    File.write!(outfile, outjson)
-    population
-  end
 end

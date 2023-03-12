@@ -17,6 +17,8 @@ defmodule GelidTest do
     def mutate_one_gene(ind), do: ind
     @impl Experiment
     def done?(generation_number), do: generation_number >= 10
+    @impl Experiment
+    def seed(_), do: :ok
   end
 
   @test_pop_size 321
@@ -75,7 +77,7 @@ defmodule GelidTest do
     test_pop = Gelid.init_population(TestExperiment, test_domain, @test_pop_size, @test_gene_size)
 
     test_result = Gelid.score(test_pop)
-    
+
     assert %Population{} = test_result
     assert length(test_result.members) == length(test_pop.members)
     [m1 | [m2 | _]] = test_result.members

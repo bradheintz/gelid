@@ -3,9 +3,10 @@ defmodule Experiment do
   @callback new_domain(domain_size :: integer) :: Domain
   @callback score(individual :: Individual.t, domain :: any) :: float
   @callback cull_population(population :: Population.t, keep_portion :: float) :: Population.t
-  @callback mix_genes(parent1 :: Individual.t, parent2 :: Individual.t, mutation_rate :: integer) :: Individual.t
+  @callback mix_genes(parent1 :: Individual.t, parent2 :: Individual.t, mutation_rate :: float) :: Individual.t
   @callback mutate_one_gene(ind :: Individual.t) :: Individual.t
   @callback done?(generation_number :: integer) :: boolean()
+  @callback seed(prng_seed :: integer) :: atom()
 
   def hello do
     :world
