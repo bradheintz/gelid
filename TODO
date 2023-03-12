@@ -25,7 +25,6 @@ PERF NOTES
 * parallelism
 * gpu?
 * be able to save state and continue a run
-* add license
 * add second experiment, perhaps factoring or something weird?
 * move abstract stuff (experiment, population modules) to Gelid. namespace
 * will things go faster if i have a cached dual representation of the genes so i don't have to use pop_at every time?
@@ -35,3 +34,4 @@ PERF NOTES
 REFACTOR
 - make hyperparams the struct part of experiment subclass
 -- easy to wrap in a script that fills in struct from persistent config
+? should i pull reporting out of the framework and into a reporter specifiied/yielded by the experiment?
