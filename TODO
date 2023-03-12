@@ -2,7 +2,6 @@ UNDERWAY
 - also do more around validation of mutation step - maybe w/ rand seed?
 - take the generation check out of done?() and keep in framework as safeguard
 - figure out how to make done?() work on more complex conditions including possibly moving averages
-* put output files in timestamp subfolders
 - see if i can add a gradient to the path plot in mathematica - tough to follow now
 - in mathematica viz interface, add dropdown or similar for existing data folders
 -- see Fast Introduction for Programmers video about InteractiveInterfaces on wolfram.com/wolfram-u

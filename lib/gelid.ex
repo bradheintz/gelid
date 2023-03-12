@@ -23,12 +23,16 @@ defmodule Gelid do
     stamp = Calendar.strftime(DateTime.utc_now(), "%Y%m%d%H%M%SZ")
     experiment.seed(prng_seed)
     domain = experiment.new_domain(domain_size)
+    if report_mode &&& 4 do
+      File.mkdir_p!(Path.join([File.cwd!(), "data", "#{stamp}"]))
+    end
+
     init_population(experiment, domain, pop_size, gene_count)
       |> score()
-      |> report(0, "#{stamp}-BEGIN", report_mode)
+      # |> report(0, "#{stamp}-BEGIN", report_mode)
       |> advance_generations_until_done(keep_portion, mutation_rate, report_mode, stamp, 1, max_gens)
       |> score() # one last time
-      |> report(max_gens, "#{stamp}-FINAL", report_mode)
+      |> report(max_gens, "#{stamp}", report_mode)
   end
 
   def init_population(experiment, domain, pop_size, gene_count) do
@@ -100,9 +104,10 @@ defmodule Gelid do
   end
   def report(population, gen_num, step, 4) do # file dump, step is timestamp
     IO.write("Generation #{gen_num}...\n")
+    data_dir = Path.join([File.cwd!(), "data", "#{step}"])
     expmt = [domain: population.domain.cities, population: _pop_member_kvs(population.members)]
     {:ok, outjson} = JSON.encode(expmt)
-    outfile = Path.join([File.cwd!(), "/data/", "#{step}-#{gen_num}.json"])
+    outfile = Path.join([data_dir, "#{step}-#{gen_num}.json"])
     File.write!(outfile, outjson)
     population
   end
