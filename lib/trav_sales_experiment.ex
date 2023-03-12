@@ -111,6 +111,7 @@ defmodule TravSalesExperiment do
   end
 
   @impl Experiment
+  @spec seed([integer] | integer | {integer, integer, integer}) :: :ok
   def seed(prng_seed) do
     :rand.seed(:exsss, prng_seed) # erlang default prng algo
     :ok

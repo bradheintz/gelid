@@ -37,18 +37,21 @@ defmodule Gelid do
     %Population{ members: pop_members, target_size: pop_size, experiment: experiment, domain: domain }
   end
 
+  def pad_gen_num(gen_num, gen_max), do: String.pad_leading("#{gen_num}", String.length("#{gen_max}"), "0")
+
   def advance_generations_until_done(population, _, _, _, _, gen_num, gen_max) when gen_num >= gen_max, do: population
   def advance_generations_until_done(population, keep_portion, mutation_rate, report_mode, stamp, gen_num, gen_max) do
-      population
-        |> report(gen_num, "entering", report_mode &&& 2)
-        |> cull_population(keep_portion)
-        |> report(gen_num, "after cull", report_mode &&& 2)
-        |> repopulate(mutation_rate)
-        |> report(gen_num, "after repopulation", report_mode &&& 2)
-        |> score()
-        |> report(gen_num, "scored and sorted", report_mode &&& 1)
-        |> report(gen_num, stamp, report_mode &&& 4)
-        |> advance_generations_until_done(keep_portion, mutation_rate, report_mode, stamp, gen_num + 1, gen_max)
+    padded_gen_num = pad_gen_num(gen_num, gen_max)
+    population
+      |> report(padded_gen_num, "entering", report_mode &&& 2)
+      |> cull_population(keep_portion)
+      |> report(padded_gen_num, "after cull", report_mode &&& 2)
+      |> repopulate(mutation_rate)
+      |> report(padded_gen_num, "after repopulation", report_mode &&& 2)
+      |> score()
+      |> report(padded_gen_num, "scored and sorted", report_mode &&& 1)
+      |> report(padded_gen_num, stamp, report_mode &&& 4)
+      |> advance_generations_until_done(keep_portion, mutation_rate, report_mode, stamp, gen_num + 1, gen_max)
   end
 
   def score_list([], _, _), do: []
